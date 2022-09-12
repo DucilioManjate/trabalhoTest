@@ -18,10 +18,12 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import javax.persistence.Id;
 import java.util.Locale;
+import java.util.Optional;
 
 import static javax.swing.text.html.parser.DTDConstants.ID;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -70,6 +72,24 @@ public class UsuarioServiceImplTest {
       }catch (Exception ex) {
           assertEquals(ErroAutenticacaoException.class,ex.getClass());
       }
-
 }
+    @Test
+    public void obterUsuarioPorId() {
+        Usuario usuario = new Usuario();
+
+        usuario.setNome(faker.name().name());
+        usuario.setEmail(faker.internet().emailAddress());
+        usuario.setSenha(faker.random().hex());
+
+        when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+
+
+        Usuario usuario2= usuarioRepository.save(usuario);
+
+        when(usuarioRepository.findById(usuario2.getId())).thenReturn(Optional.of(usuario2));
+
+        Optional<Usuario>  usuario1 = usuarioService.obterPorId(usuario2.getId());
+        assertTrue(usuario1.isPresent());
+
+    }
 }
