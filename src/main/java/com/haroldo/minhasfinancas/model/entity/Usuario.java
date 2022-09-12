@@ -36,4 +36,6 @@ public class Usuario {
 	@JsonIgnore
 	private String senha;
 
+    public Usuario(String s, String skrrrr, String s1) {
+    }
 }
