@@ -1,6 +1,7 @@
 package com.haroldo.minhasfinancas.service.impl;
 
 import com.github.javafaker.Faker;
+import com.haroldo.minhasfinancas.exception.ErroAutenticacaoException;
 import com.haroldo.minhasfinancas.exception.RegraNegocioException;
 import com.haroldo.minhasfinancas.model.entity.Usuario;
 import com.haroldo.minhasfinancas.model.repository.UsuarioRepository;
@@ -19,7 +20,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Locale;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static javax.swing.text.html.parser.DTDConstants.ID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -49,7 +51,7 @@ public class UsuarioServiceImplTest {
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
 
         Usuario resultdb = usuarioService.salvarUsuario(usuario);
-        Assertions.assertEquals(usuario, resultdb);
+        assertEquals(usuario, resultdb);
     }
 
     @Test
@@ -59,4 +61,15 @@ public class UsuarioServiceImplTest {
         when(usuarioRepository.existsByEmail(any())).thenReturn(true);
         Assertions.assertThrows(RegraNegocioException.class, ()-> usuarioService.salvarUsuario(usuario));
     }
+
+    @Test
+    public void erroQuandoNaoForEncotradaUsuario() {
+      when(usuarioRepository.findByEmail("lio@hmail.com")).thenThrow(new ErroAutenticacaoException("usuario nao encontrado"));
+      try{
+          usuarioService.autenticar("lio","1233");
+      }catch (Exception ex) {
+          assertEquals(ErroAutenticacaoException.class,ex.getClass());
+      }
+
+}
 }
